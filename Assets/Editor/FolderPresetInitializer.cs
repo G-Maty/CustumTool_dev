@@ -34,7 +34,7 @@ namespace CustomTools.Editor
 
             // デフォルトプリセットを作成
             var preset = ScriptableObject.CreateInstance<FolderPreset>();
-            preset.presetName = "汎用ゲームプロジェクト";
+            preset.presetName = "汎用ゲームプロジェクト用プリセット";
             preset.folderNames = new[]
             {
                 "Scripts",

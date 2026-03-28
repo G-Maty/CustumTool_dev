@@ -40,7 +40,10 @@ namespace CustomTools.Editor
 
         // ────────────────────────────── メニュー ──────────────────────────────
 
-        [MenuItem("Tools/Custom Tools/Folder Generator")]
+        [MenuItem("Tools/Custom Tools/Folder Generator")] // ヘッダメニュー名/ヘッダ以下のメニュー名
+        /// <summary>
+        /// Folder Generator ウィンドウを開き、最小サイズを設定します。
+        /// </summary>
         public static void ShowWindow()
         {
             var window = GetWindow<FolderGeneratorWindow>("Folder Generator");
@@ -49,18 +52,31 @@ namespace CustomTools.Editor
 
         // ────────────────────────────── GUI 描画 ──────────────────────────────
 
+        /// <summary>
+        /// UI本体：EditorWindowの画面を毎フレーム描画
+        /// エディタウィンドウ全体の GUI を描画
+        /// </summary>
         private void OnGUI()
         {
+            // スクロール位置を保持しつつ、全体をスクロール可能にする
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
+            // 対象フォルダを選ぶUI
             DrawTargetFolderSection();
             EditorGUILayout.Space(8);
+
+            // プリセット選択UI
             DrawPresetSection();
             EditorGUILayout.Space(8);
+
+            // カスタムフォルダ追加UI
             DrawCustomFolderSection();
             EditorGUILayout.Space(12);
+
+            // 生成ボタン
             DrawGenerateButton();
 
+            // 生成結果表示
             if (_showResult)
             {
                 EditorGUILayout.Space(8);
@@ -72,11 +88,14 @@ namespace CustomTools.Editor
 
         // ======================== 1. 対象フォルダ指定 ========================
 
+        /// <summary>
+        /// 対象フォルダの選択 UI と新規フォルダ作成 UI を描画
+        /// </summary>
         private void DrawTargetFolderSection()
         {
             EditorGUILayout.LabelField("対象フォルダ", EditorStyles.boldLabel);
 
-            using (new EditorGUILayout.HorizontalScope())
+            using (new EditorGUILayout.HorizontalScope()) // 水平レイアウトでフォルダ選択と新規作成ボタンを配置
             {
                 _targetFolder = (DefaultAsset)EditorGUILayout.ObjectField(
                     "フォルダ",
@@ -97,7 +116,7 @@ namespace CustomTools.Editor
                 _targetFolder = null;
             }
 
-            // 新規フォルダ作成 UI
+            // 新規フォルダ作成 UI：ボタンが押されたときに処理される
             if (_showNewFolderField)
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
@@ -117,6 +136,9 @@ namespace CustomTools.Editor
             }
         }
 
+        /// <summary>
+        /// 入力内容をもとに新しいフォルダを作成し、対象フォルダとして選択
+        /// </summary>
         private void CreateAndSelectNewFolder()
         {
             string folderName = _newFolderName.Trim();
@@ -137,10 +159,10 @@ namespace CustomTools.Editor
             else
             {
                 AssetDatabase.CreateFolder(parentPath, folderName);
-                AssetDatabase.Refresh();
+                AssetDatabase.Refresh(); //Project 内のアセット状態を再読み込みして更新するため
             }
 
-            // Object として取得して設定
+            // 作成したフォルダをターゲットフォルダに設定
             _targetFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(fullPath);
             _newFolderName = "";
             _showNewFolderField = false;
@@ -148,6 +170,9 @@ namespace CustomTools.Editor
 
         // ======================== 2. プリセット選択 ========================
 
+        /// <summary>
+        /// プリセットの選択 UI とフォルダ選択トグルを描画
+        /// </summary>
         private void DrawPresetSection()
         {
             EditorGUILayout.LabelField("プリセット", EditorStyles.boldLabel);
@@ -209,6 +234,9 @@ namespace CustomTools.Editor
             }
         }
 
+        /// <summary>
+        /// 現在のプリセット内容に合わせてフォルダ選択トグルを再構築
+        /// </summary>
         private void RebuildToggles()
         {
             _folderToggles.Clear();
@@ -222,6 +250,11 @@ namespace CustomTools.Editor
             }
         }
 
+        /// <summary>
+        /// 指定したプリセットが現在のキャッシュ状態から変更されているかを判定
+        /// </summary>
+        /// <param name="preset">変更有無を確認するプリセットです。</param>
+        /// <returns>プリセット構成が変化していれば true を返します。</returns>
         private bool HasPresetChanged(FolderPreset preset)
         {
             if (preset == null) return false;
@@ -231,6 +264,10 @@ namespace CustomTools.Editor
             return preset.folderNames.Length != _folderToggles.Count;
         }
 
+        /// <summary>
+        /// すべてのフォルダ選択トグルを指定した値に設定
+        /// </summary>
+        /// <param name="value">各トグルに設定する値です。</param>
         private void SetAllToggles(bool value)
         {
             for (int i = 0; i < _folderToggles.Count; i++)
@@ -241,6 +278,9 @@ namespace CustomTools.Editor
 
         // ======================== 3. カスタムフォルダ追加 ========================
 
+        /// <summary>
+        /// カスタムフォルダ名の追加・削除 UI を描画
+        /// </summary>
         private void DrawCustomFolderSection()
         {
             EditorGUILayout.LabelField("カスタムフォルダ追加", EditorStyles.boldLabel);
@@ -280,6 +320,9 @@ namespace CustomTools.Editor
 
         // ======================== 4. 生成ボタン ========================
 
+        /// <summary>
+        /// 生成可否の状態に応じてフォルダ生成ボタンと補足メッセージを描画
+        /// </summary>
         private void DrawGenerateButton()
         {
             bool hasTarget = _targetFolder != null;
@@ -314,6 +357,9 @@ namespace CustomTools.Editor
 
         // ======================== 生成ロジック ========================
 
+        /// <summary>
+        /// 選択されたフォルダ名を対象フォルダ配下に生成し、結果を記録
+        /// </summary>
         private void GenerateFolders()
         {
             string targetPath = AssetDatabase.GetAssetPath(_targetFolder);
@@ -358,6 +404,9 @@ namespace CustomTools.Editor
 
         // ======================== 5. 結果表示 ========================
 
+        /// <summary>
+        /// フォルダ生成結果のサマリーと詳細一覧を描画
+        /// </summary>
         private void DrawResultSection()
         {
             // 区切り線
@@ -417,6 +466,10 @@ namespace CustomTools.Editor
 
         // ======================== ヘルパー ========================
 
+        /// <summary>
+        /// 現在選択されている生成対象フォルダ数を取得
+        /// </summary>
+        /// <returns>プリセットとカスタム入力を含む選択済みフォルダ数を返します。</returns>
         private int GetSelectedFolderCount()
         {
             int count = 0;
@@ -436,6 +489,10 @@ namespace CustomTools.Editor
             return count;
         }
 
+        /// <summary>
+        /// 現在選択されているフォルダ名の一覧を重複を除いて取得
+        /// </summary>
+        /// <returns>生成対象となるフォルダ名の一覧を返します。</returns>
         private List<string> GetSelectedFolderNames()
         {
             List<string> names = new List<string>();
@@ -464,6 +521,11 @@ namespace CustomTools.Editor
             return names;
         }
 
+        /// <summary>
+        /// 指定したアセットがフォルダかどうかを判定
+        /// </summary>
+        /// <param name="asset">判定対象のアセットです。</param>
+        /// <returns>アセットが有効なフォルダであれば true を返します。</returns>
         private static bool IsFolder(DefaultAsset asset)
         {
             string path = AssetDatabase.GetAssetPath(asset);
