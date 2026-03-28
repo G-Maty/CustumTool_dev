@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 715ecabc8ab5ed64981ae59c39302771, type: 3}
+  m_Name: DefaultGameProject
+  m_EditorClassIdentifier: CustomTools.Editor::CustomTools.Editor.FolderPreset
+  presetName: "\u6C4E\u7528\u30B2\u30FC\u30E0\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8"
+  folderNames:
+  - G_Scripts
+  - G_Prefabs
+  - G_Materials
+  - G_Textures
+  - G_Audio
+  - G_Animations
