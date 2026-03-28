@@ -144,12 +144,6 @@ namespace CustomTools.Editor
             string folderName = _newFolderName.Trim();
             string parentPath = "Assets";
 
-            // 既に対象フォルダが指定されていれば、その中に作成する
-            if (_targetFolder != null)
-            {
-                parentPath = AssetDatabase.GetAssetPath(_targetFolder);
-            }
-
             string fullPath = $"{parentPath}/{folderName}";
 
             if (AssetDatabase.IsValidFolder(fullPath))
