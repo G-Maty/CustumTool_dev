@@ -320,7 +320,7 @@ namespace CustomTools.Editor
         private void DrawGenerateButton()
         {
             bool hasTarget = _targetFolder != null;
-            bool hasFolders = GetSelectedFolderCount() > 0;
+            bool hasFolders = GetSelectedFolderNames().Count > 0;
             bool canGenerate = hasTarget && hasFolders;
 
             if (!hasTarget)
@@ -342,7 +342,7 @@ namespace CustomTools.Editor
                     fixedHeight = 36
                 };
 
-                if (GUILayout.Button($"フォルダを生成 ({GetSelectedFolderCount()} 個)", buttonStyle))
+                if (GUILayout.Button($"フォルダを生成 ({GetSelectedFolderNames().Count} 個)", buttonStyle))
                 {
                     GenerateFolders();
                 }
@@ -459,29 +459,6 @@ namespace CustomTools.Editor
         }
 
         // ======================== ヘルパー ========================
-
-        /// <summary>
-        /// 現在選択されている生成対象フォルダ数を取得
-        /// </summary>
-        /// <returns>プリセットとカスタム入力を含む選択済みフォルダ数を返します。</returns>
-        private int GetSelectedFolderCount()
-        {
-            int count = 0;
-
-            // プリセットからの選択数
-            if (_selectedPreset != null && _selectedPreset.folderNames != null)
-            {
-                for (int i = 0; i < _selectedPreset.folderNames.Length && i < _folderToggles.Count; i++)
-                {
-                    if (_folderToggles[i]) count++;
-                }
-            }
-
-            // カスタムフォルダ数
-            count += _customFolderNames.Count;
-
-            return count;
-        }
 
         /// <summary>
         /// 現在選択されているフォルダ名の一覧を重複を除いて取得
