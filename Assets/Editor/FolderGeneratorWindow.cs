@@ -30,6 +30,14 @@ namespace CustomTools.Editor
         // スクロール
         private Vector2 _scrollPos;
 
+        // 生成結果
+        private bool _showResult;
+        private int _resultCreatedCount;
+        private int _resultSkippedCount;
+        private string _resultTargetPath = "";
+        private List<string> _resultCreatedFolders = new List<string>();
+        private List<string> _resultSkippedFolders = new List<string>();
+
         // ────────────────────────────── メニュー ──────────────────────────────
 
         [MenuItem("Tools/Custom Tools/Folder Generator")]
@@ -52,6 +60,12 @@ namespace CustomTools.Editor
             DrawCustomFolderSection();
             EditorGUILayout.Space(12);
             DrawGenerateButton();
+
+            if (_showResult)
+            {
+                EditorGUILayout.Space(8);
+                DrawResultSection();
+            }
 
             EditorGUILayout.EndScrollView();
         }
@@ -331,24 +345,74 @@ namespace CustomTools.Editor
 
             AssetDatabase.Refresh();
 
-            // 結果サマリー
-            string summary = $"フォルダ生成完了!\n\n" +
-                             $"作成: {createdCount} 個\n" +
-                             $"スキップ (既存): {skippedCount} 個\n\n" +
-                             $"対象: {targetPath}";
+            // 結果をフィールドに保存してウィンドウ内に表示
+            _showResult = true;
+            _resultCreatedCount = createdCount;
+            _resultSkippedCount = skippedCount;
+            _resultTargetPath = targetPath;
+            _resultCreatedFolders = createdFolders;
+            _resultSkippedFolders = skippedFolders;
 
-            if (createdFolders.Count > 0)
+            Debug.Log($"[Folder Generator] フォルダ生成完了 — 作成: {createdCount} 個, スキップ: {skippedCount} 個 ({targetPath})");
+        }
+
+        // ======================== 5. 結果表示 ========================
+
+        private void DrawResultSection()
+        {
+            // 区切り線
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+
+            // ヘッダーと閉じるボタン
+            using (new EditorGUILayout.HorizontalScope())
             {
-                summary += $"\n\n作成されたフォルダ:\n  {string.Join("\n  ", createdFolders)}";
+                EditorGUILayout.LabelField("生成結果", EditorStyles.boldLabel);
+                if (GUILayout.Button("×", GUILayout.Width(24)))
+                {
+                    _showResult = false;
+                    return;
+                }
             }
 
-            if (skippedFolders.Count > 0)
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+            // サマリー
+            EditorGUILayout.LabelField($"対象: {_resultTargetPath}", EditorStyles.wordWrappedLabel);
+            EditorGUILayout.Space(4);
+
+            // 作成カウント（緑系）
+            var createdStyle = new GUIStyle(EditorStyles.label) { richText = true };
+            EditorGUILayout.LabelField(
+                $"<b>作成:</b> {_resultCreatedCount} 個　　<b>スキップ (既存):</b> {_resultSkippedCount} 個",
+                createdStyle);
+
+            // 作成されたフォルダ一覧
+            if (_resultCreatedFolders.Count > 0)
             {
-                summary += $"\n\nスキップされたフォルダ:\n  {string.Join("\n  ", skippedFolders)}";
+                EditorGUILayout.Space(4);
+                EditorGUILayout.LabelField("作成されたフォルダ:", EditorStyles.miniBoldLabel);
+                EditorGUI.indentLevel++;
+                foreach (string folder in _resultCreatedFolders)
+                {
+                    EditorGUILayout.LabelField($"+ {folder}", EditorStyles.miniLabel);
+                }
+                EditorGUI.indentLevel--;
             }
 
-            Debug.Log($"[Folder Generator] {summary}");
-            EditorUtility.DisplayDialog("Folder Generator", summary, "OK");
+            // スキップされたフォルダ一覧
+            if (_resultSkippedFolders.Count > 0)
+            {
+                EditorGUILayout.Space(4);
+                EditorGUILayout.LabelField("スキップされたフォルダ:", EditorStyles.miniBoldLabel);
+                EditorGUI.indentLevel++;
+                foreach (string folder in _resultSkippedFolders)
+                {
+                    EditorGUILayout.LabelField($"- {folder}", EditorStyles.miniLabel);
+                }
+                EditorGUI.indentLevel--;
+            }
+
+            EditorGUILayout.EndVertical();
         }
 
         // ======================== ヘルパー ========================
